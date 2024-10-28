@@ -26,4 +26,12 @@ public class Block {
     	shape.setColor(cc);
         shape.rect(x, y, width, height);
     }
+
+    public int getX(){
+        return this.x;
+    }
+
+    public int getY(){
+        return this.y;
+    }
 }

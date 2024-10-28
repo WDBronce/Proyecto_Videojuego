@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 
+
 public class BlockBreakerGame extends ApplicationAdapter {
     private OrthographicCamera camera;
 	private SpriteBatch batch;
@@ -25,9 +26,20 @@ public class BlockBreakerGame extends ApplicationAdapter {
 	private int puntaje;
 	private int nivel;
 
+    // <<<Alumnos>>>
+    private GameState currentState;
+    // <<<Alumnos>>>
+
 		@Override
 		public void create () {
-			camera = new OrthographicCamera();
+
+            // <<<Alumnos>>>
+            // Crear estado
+            currentState = new StartState();
+            // <<<Alumnos>>>
+
+            // <<<Cubillos>>>
+            camera = new OrthographicCamera();
 		    camera.setToOrtho(false, 800, 480);
 		    batch = new SpriteBatch();
 		    font = new BitmapFont();
@@ -35,14 +47,26 @@ public class BlockBreakerGame extends ApplicationAdapter {
 		    nivel = 1;
 		    crearBloques(2+nivel);
 
+
 		    shape = new ShapeRenderer();
 		    ball = new PingBall(Gdx.graphics.getWidth()/2-10, 41, 10, 5, 7, true);
 		    pad = new Paddle(Gdx.graphics.getWidth()/2-50,40,100,10);
-		    vidas = 3;
+		    vidas = 5;
 		    puntaje = 0;
+            // <<<Cubillos>>>
 		}
+
+        // <<<Alumnos>>>
+        public void changeState(GameState newState) {
+            currentState = newState;
+        }
+        //  <<<Alumnos>>>
+
 		public void crearBloques(int filas) {
-			blocks.clear();
+
+
+            // <<<Cubillos>>>
+            blocks.clear();
 			int blockWidth = 70;
 		    int blockHeight = 26;
 		    int y = Gdx.graphics.getHeight();
@@ -52,9 +76,12 @@ public class BlockBreakerGame extends ApplicationAdapter {
 		            blocks.add(new Block(x, y, blockWidth, blockHeight));
 		        }
 		    }
+            // <<<Cubillos>>>
 		}
 		public void dibujaTextos() {
-			//actualizar matrices de la cámara
+
+
+            //actualizar matrices de la cámara
 			camera.update();
 			//actualizar
 			batch.setProjectionMatrix(camera.combined);
@@ -63,6 +90,7 @@ public class BlockBreakerGame extends ApplicationAdapter {
 			font.draw(batch, "Puntos: " + puntaje, 10, 25);
 			font.draw(batch, "Vidas : " + vidas, Gdx.graphics.getWidth()-20, 25);
 			batch.end();
+
 		}
 
 		@Override
@@ -104,6 +132,10 @@ public class BlockBreakerGame extends ApplicationAdapter {
 	            Block b = blocks.get(i);
 	            if (b.destroyed) {
 	            	puntaje++;
+                    if(Math.random() < 0.3) {
+                        PowerUp nuevoPowerUp = Math.random() < 0.5 ? new Enlarge(b.x, b.y) : new Multiply(b.getX(),b.getY());
+
+                    }
 	                blocks.remove(b);
 	                i--; //para no saltarse 1 tras eliminar del arraylist
 	            }
@@ -118,6 +150,13 @@ public class BlockBreakerGame extends ApplicationAdapter {
 
 		@Override
 		public void dispose () {
-
+            batch.dispose();
+            if (currentState != null) {
+                //currentState.dispose();
+            }
 		}
+
+        public Paddle getPad(){
+            return this.pad;
+        }
 	}
