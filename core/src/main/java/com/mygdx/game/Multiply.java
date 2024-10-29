@@ -9,42 +9,56 @@ public class Multiply implements PowerUp{
     private boolean active;
     private Color color;
     public static final int duration = 300;
+    private ShapeRenderer shape;
 
-    public Multiply(int x, int y){
+    public Multiply(int x, int y, ShapeRenderer shape) {
         this.x = x;
         this.y = y;
-        this.size = 20;
-        this.speed = 4;
+        this.size = 10;
+        this.speed = 2;
         this.active = true;
         this.color = Color.PURPLE;
+        this.shape = shape;
     }
 
     @Override
     public void applyEffect(BlockBreakerGame game){
 
+        PingBall newBall = new PingBall(game.getBall().getX(), game.getBall().getY(), 10 ,-3 ,3, false);
+        game.addBall(newBall);
+        newBall.draw(shape);
+        active = false;
+
     }
 
     @Override
     public void fall(){
-
+        if (!active) return;
+        y -= speed;
     }
 
     @Override
     public void draw(ShapeRenderer shape) {
-
+        if (!active) return;
+        shape.setColor(color);
+        shape.x(x,y, size);
     }
 
     @Override
-    public boolean active() {
-
-
-        return false;
-    }
+    public boolean active() {return active;}
 
     @Override
-    public boolean colision(Paddle paddle) {
-        return false;
+    public boolean colision(Paddle pad) {
+        return active && (pad.getX() + pad.getWidth() >= x - size && pad.getX() <= x + size) &&
+            (pad.getY() + pad.getHeight() >= y - size && pad.getY() <= y + size);
     }
 
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
 }

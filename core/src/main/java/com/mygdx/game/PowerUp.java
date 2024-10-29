@@ -8,4 +8,6 @@ public interface PowerUp {
     void draw(ShapeRenderer shape);
     boolean active();
     boolean colision(Paddle paddle);
+    int getX();
+    int getY();
 }

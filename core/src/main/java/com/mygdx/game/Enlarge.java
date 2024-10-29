@@ -13,8 +13,8 @@ public class Enlarge implements PowerUp{
     public Enlarge(int x, int y){
         this.x = x;
         this.y = y;
-        this.size = 20;
-        this.speed = 4;
+        this.size = 10;
+        this.speed = 2;
         this.active = true;
         this.color = Color.GOLD;
     }
@@ -55,9 +55,16 @@ public class Enlarge implements PowerUp{
     }
 
     @Override
-    public boolean colision(Paddle paddle) {
-        return false;
+    public boolean colision(Paddle pad) {
+        return active && (pad.getX() + pad.getWidth() >= x - size && pad.getX() <= x + size) &&
+            (pad.getY() + pad.getHeight() >= y - size && pad.getY() <= y + size);
     }
 
+    public int getX() {
+        return x;
+    }
 
+    public int getY() {
+        return y;
+    }
 }
