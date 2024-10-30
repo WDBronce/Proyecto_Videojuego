@@ -1,11 +1,17 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public abstract class GameState {
-    public abstract void update();
-    public abstract void draw(SpriteBatch batch);
-    public abstract void handleInput();
+    protected BlockBreakerGame game;
 
+    public GameState(BlockBreakerGame game) {
+        this.game = game;
+    }
+
+    public abstract void update(float deltaTime);
+    public abstract void render(SpriteBatch batch);
+    public abstract void dispose();
+
+    public abstract void update();
 }

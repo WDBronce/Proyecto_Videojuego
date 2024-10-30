@@ -22,13 +22,10 @@ public class Multiply implements PowerUp{
     }
 
     @Override
-    public void applyEffect(BlockBreakerGame game){
-
+    public void applyEffect(MainGameState game){
         PingBall newBall = new PingBall(game.getBall().getX(), game.getBall().getY(), 10 ,-3 ,3, false);
         game.addBall(newBall);
-        newBall.draw(shape);
         active = false;
-
     }
 
     @Override

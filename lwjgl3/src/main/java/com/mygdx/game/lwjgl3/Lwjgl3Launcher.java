@@ -12,10 +12,12 @@ public class Lwjgl3Launcher {
     }
 
     private static Lwjgl3Application createApplication() {
+        System.out.println("OLA");
         return new Lwjgl3Application(new BlockBreakerGame(), getDefaultConfiguration());
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
+        System.out.println("OSA");
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("BlockBreaker2024");
         //// Vsync limits the frames per second to what your hardware can display, and helps eliminate
@@ -30,6 +32,7 @@ public class Lwjgl3Launcher {
         configuration.setWindowedMode(640, 480);
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
+        System.out.println("a");
         return configuration;
     }
 }

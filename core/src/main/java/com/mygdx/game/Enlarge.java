@@ -20,13 +20,13 @@ public class Enlarge implements PowerUp{
     }
 
     @Override
-    public void applyEffect(BlockBreakerGame game){
+    public void applyEffect(MainGameState game){
         Paddle pad = game.getPad();
         pad.setWidth(pad.getWidth() + 50);
 
         new Thread(() -> {
             try {
-                Thread.sleep(duration*16);
+                Thread.sleep(duration*10);
                 pad.setWidth(pad.getWidth()-50);
             }catch(InterruptedException e){
                 e.printStackTrace();
@@ -34,6 +34,8 @@ public class Enlarge implements PowerUp{
         }).start();
 
         active = false;
+
+
     }
 
     @Override
