@@ -17,18 +17,8 @@ import com.sun.tools.javac.Main;
 public class BlockBreakerGame extends ApplicationAdapter {
     // Atributos
     // Atributos varios
-    private OrthographicCamera camera;
     private GameState currentState;
-    private ShapeRenderer shape;
     private SpriteBatch batch;
-    private BitmapFont font;
-    private PingBall ball;
-    private Paddle pad;
-
-    // Atributos primitivos
-    private int points;
-    private int level;
-    private int life;
 
     // Metodos
     @Override

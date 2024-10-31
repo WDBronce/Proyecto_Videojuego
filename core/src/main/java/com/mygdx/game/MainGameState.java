@@ -85,10 +85,7 @@ public class MainGameState extends GameState {
     }
 
     @Override
-    public void update(float deltaTime) {
-        // copiar y pegar logica?
-        // game.updateGameLogic();  // Lógica de actualización del juego
-    }
+    public void update(float deltaTime) {}
 
     @Override
     public void render (SpriteBatch batch) {
@@ -200,7 +197,7 @@ public class MainGameState extends GameState {
 
     }
 
-    //Getters
+    //Getters y setter
     public Paddle getPad() {
         return pad;
     }
@@ -224,4 +221,13 @@ public class MainGameState extends GameState {
     public void setShield(boolean shield) {
         this.shield = shield;
     }
+
+    public int getPoints() {return points;}
+
+    public void setPoints(int points) {this.points = points;}
+
+    public GameState getCurrentState() {return currentState;}
+
+    public void setCurrentState(GameState currentState) {this.currentState = currentState;}
+
 }
