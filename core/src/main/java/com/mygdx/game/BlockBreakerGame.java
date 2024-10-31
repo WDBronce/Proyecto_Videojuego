@@ -75,11 +75,7 @@ public class BlockBreakerGame extends ApplicationAdapter {
 
 
 
-    public void addBall(PingBall ball) {
-        if (currentState instanceof MainGameState) {
-            ((MainGameState) currentState).addBall(ball);
-        }
-    }
+
 
 
 

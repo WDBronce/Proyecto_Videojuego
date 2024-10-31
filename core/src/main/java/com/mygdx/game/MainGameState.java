@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -14,7 +15,6 @@ import java.util.ArrayList;
 public class MainGameState extends GameState {
 
     // Colecciones de atributos del juego
-    private ArrayList<PingBall> ballsInScreen = new ArrayList<>();
     private ArrayList<PowerUp> powerUps = new ArrayList<>();
     private ArrayList<Block> blocks = new ArrayList<>();
 
@@ -27,10 +27,13 @@ public class MainGameState extends GameState {
     private PingBall ball;
     private Paddle pad;
 
+
     // Atributos primitivos
     private int points;
     private int level;
     private int life;
+    private boolean shield;
+
 
     // Constructor
     public MainGameState(BlockBreakerGame game) {
@@ -42,16 +45,17 @@ public class MainGameState extends GameState {
         shape = new ShapeRenderer();
         batch = new SpriteBatch();
         font = new BitmapFont();
-        ballsInScreen = new ArrayList<>();
+
         blocks = new ArrayList<>();
 
         points = 0;
         life = 3;
+        shield = false;
 
         // Crear objetos del juego
         pad = new Paddle(Gdx.graphics.getWidth() / 2 - 50, 40, 100, 10);
         ball = new PingBall(Gdx.graphics.getWidth() / 2 - 10, 41, 10, 3, 4, true);
-        ballsInScreen.add(ball);
+
         createBlocks(3); // Ejemplo con 3 filas de bloques
     }
 
@@ -99,22 +103,22 @@ public class MainGameState extends GameState {
                 ball.setEstaQuieto(false);
             }
         }else{
-            for (PingBall actualBall : ballsInScreen) {
-                actualBall.update();     // Actualiza la posición de cada pelota
-            }
+                ball.update();// Actualiza la posición de cada pelota
         }
 
         //verificar si se fue la bola x abajo
         if (ball.getY()<0) {
-            if (ballsInScreen.size() <= 1) { // Se verifica que solo haya una bola en pantalla para quitar la vida
+            if(!shield){
                 life--;
                 //nivel = 1;
                 ball = new PingBall(pad.getX()+pad.getWidth()/2-5, pad.getY()+pad.getHeight()+11, 10, 3, 4, true);
-                ballsInScreen.remove(ball);
             }else{
-                ballsInScreen.remove(ball);
+                ball.setXY(pad.getX()+pad.getWidth()/2-5, pad.getY()+pad.getHeight()+11);
+                shield = false;
             }
         }
+
+
         // verificar game over
         if (life<=0) {
             game.setGameState(new EndState(game));
@@ -131,18 +135,24 @@ public class MainGameState extends GameState {
         //dibujar bloques
         for (Block b : blocks) {
             b.draw(shape);
-            for(PingBall actualBall : ballsInScreen){
-                actualBall.checkCollision(b);
-            }
-
+            ball.checkCollision(b);
         }
 
         // actualizar estado de los bloques
         for (int i = 0; i < blocks.size(); i++) {
             Block b = blocks.get(i);
             if (b.destroyed) {
-                if(Math.random() < 0.35){
-                    PowerUp newPower = Math.random() < 0.5 ? new Enlarge(b.x,b.y) : new Multiply(b.x, b.y, shape);
+                if(Math.random() < 0.30){
+                    double powerUpChance = Math.random();
+
+                    PowerUp newPower;
+                    if (powerUpChance < 0.6) { // 60% de probabilidad para Enlarge
+                        newPower = new Enlarge(b.x, b.y);
+                    } else if (powerUpChance < 0.85) { // 25% de probabilidad para Shield
+                        newPower = new Shield(b.x, b.y);
+                    } else { // 15% de probabilidad para ExtraLife
+                        newPower = new ExtraLife(b.x, b.y);
+                    }
                     powerUps.add(newPower);
                 }
                 points++;
@@ -182,9 +192,7 @@ public class MainGameState extends GameState {
         shape.dispose();
     }
 
-    public void addBall(PingBall ball) {
-        ballsInScreen.add(ball);
-    }
+
 
 
     @Override
@@ -199,5 +207,21 @@ public class MainGameState extends GameState {
 
     public PingBall getBall() {
         return ball;
+    }
+
+    public int getLife() {
+        return life;
+    }
+
+    public void setLife(int life) {
+        this.life = life;
+    }
+
+    public boolean getShield() {
+        return shield;
+    }
+
+    public void setShield(boolean shield) {
+        this.shield = shield;
     }
 }
