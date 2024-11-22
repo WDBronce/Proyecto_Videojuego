@@ -27,13 +27,9 @@ public class MainGameState extends GameState {
     private PingBall ball;
     private Paddle pad;
 
-
-    // Atributos primitivos
-    private int points;
-    private int level;
-    private int life;
-    private boolean shield;
-
+    //Los atributos primitivos fueron
+    //reemplazados, para el uso del patron Singleton en GameConfig
+    GameConfig config = GameConfig.getInstance();
 
     // Constructor
     public MainGameState(BlockBreakerGame game) {
@@ -48,9 +44,7 @@ public class MainGameState extends GameState {
 
         blocks = new ArrayList<>();
 
-        points = 0;
-        life = 3;
-        shield = false;
+
 
         // Crear objetos del juego
         pad = new Paddle(Gdx.graphics.getWidth() / 2 - 50, 40, 100, 10);
@@ -79,8 +73,8 @@ public class MainGameState extends GameState {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         //dibujar textos
-        font.draw(batch, "Puntos: " + points, 10, 25);
-        font.draw(batch, "Vidas : " + life, Gdx.graphics.getWidth()-20, 25);
+        font.draw(batch, "Puntos: " + config.getPoints(), 10, 25);
+        font.draw(batch, "Vidas : " + config.getLives(), Gdx.graphics.getWidth()-20, 25);
         batch.end();
     }
 
@@ -89,6 +83,7 @@ public class MainGameState extends GameState {
 
     @Override
     public void render (SpriteBatch batch) {
+        int aux;
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         shape.begin(ShapeRenderer.ShapeType.Filled);
         pad.draw(shape);
@@ -105,27 +100,29 @@ public class MainGameState extends GameState {
 
         //verificar si se fue la bola x abajo
         if (ball.getY()<0) {
-            if(!shield){
-                life--;
+            if(!config.getShield()){
+                aux = config.getLives();
+                config.setLives(aux-1);
                 //nivel = 1;
                 ball = new PingBall(pad.getX()+pad.getWidth()/2-5, pad.getY()+pad.getHeight()+11, 10, 3, 4, true);
             }else{
                 ball.setXY(pad.getX()+pad.getWidth()/2-5, pad.getY()+pad.getHeight()+11);
-                shield = false;
+                config.setShield(false);
             }
         }
 
 
         // verificar game over
-        if (life<=0) {
+        if (config.getLives()<=0) {
             game.setGameState(new EndState(game));
             ((EndState)currentState).render(batch);
         }
 
         // verificar si el nivel se terminó
         if (blocks.size()==0) {
-            level++;
-            createBlocks(2+level);
+            aux = config.getLevel();
+            config.setLevel(aux+1);
+            createBlocks(2+config.getLevel());
             ball = new PingBall(pad.getX()+pad.getWidth()/2-5, pad.getY()+pad.getHeight()+11, 10, 5, 7, true);
         }
 
@@ -152,7 +149,8 @@ public class MainGameState extends GameState {
                     }
                     powerUps.add(newPower);
                 }
-                points++;
+                aux = config.getPoints();
+                config.addPoints(aux+1);
                 blocks.remove(b);
                 i--; //para no saltarse 1 tras eliminar del arraylist
             }
@@ -207,24 +205,28 @@ public class MainGameState extends GameState {
     }
 
     public int getLife() {
-        return life;
+        return config.getLives();
     }
 
     public void setLife(int life) {
-        this.life = life;
+        config.setLives(life);
     }
 
     public boolean getShield() {
-        return shield;
+        return config.getShield();
     }
 
     public void setShield(boolean shield) {
-        this.shield = shield;
+        config.setShield(shield);
     }
 
-    public int getPoints() {return points;}
+    public int getPoints() {
+        return config.getPoints();
+    }
 
-    public void setPoints(int points) {this.points = points;}
+    public void setPoints(int points) {
+        config.setPoints(points);
+    }
 
     public GameState getCurrentState() {return currentState;}
 
