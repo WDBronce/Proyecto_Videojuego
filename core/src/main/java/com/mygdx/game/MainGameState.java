@@ -26,6 +26,8 @@ public class MainGameState extends GameState {
     private BitmapFont font;
     private PingBall ball;
     private Paddle pad;
+    private PowerUpBuilder builder;
+    private int aux;
 
     //Los atributos primitivos fueron
     //reemplazados, para el uso del patron Singleton en GameConfig
@@ -41,7 +43,7 @@ public class MainGameState extends GameState {
         shape = new ShapeRenderer();
         batch = new SpriteBatch();
         font = new BitmapFont();
-
+        builder = new PowerUpBuilder();
         blocks = new ArrayList<>();
 
 
@@ -83,7 +85,6 @@ public class MainGameState extends GameState {
 
     @Override
     public void render (SpriteBatch batch) {
-        int aux;
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         shape.begin(ShapeRenderer.ShapeType.Filled);
         pad.draw(shape);
@@ -141,12 +142,13 @@ public class MainGameState extends GameState {
 
                     PowerUp newPower;
                     if (powerUpChance < 0.6) { // 60% de probabilidad para Enlarge
-                        newPower = new Enlarge(b.x, b.y);
+                        builder.setType(Enlarge.class).setColor(Color.GOLD);
                     } else if (powerUpChance < 0.85) { // 25% de probabilidad para Shield
-                        newPower = new Shield(b.x, b.y);
+                        builder.setType(Shield.class).setColor(Color.ORANGE);
                     } else { // 15% de probabilidad para ExtraLife
-                        newPower = new ExtraLife(b.x, b.y);
+                        builder.setType(ExtraLife.class).setColor(Color.GREEN);
                     }
+                    newPower = builder.setPosition(b.getX(), b.getY()).setSize(10).setSpeed(2).build();
                     powerUps.add(newPower);
                 }
                 aux = config.getPoints();

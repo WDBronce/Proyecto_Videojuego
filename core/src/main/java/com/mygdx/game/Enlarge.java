@@ -10,13 +10,13 @@ public class Enlarge implements PowerUp{
     private Color color;
     public static final int duration = 300;
 
-    public Enlarge(int x, int y){
+    public Enlarge(int x, int y, int size, int speed, Color color) {
         this.x = x;
         this.y = y;
-        this.size = 10;
-        this.speed = 2;
+        this.size = size;
+        this.speed = speed;
+        this.color = color;
         this.active = true;
-        this.color = Color.GOLD;
     }
 
     @Override
