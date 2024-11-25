@@ -72,7 +72,8 @@ public class PingBall {
 	    public void checkCollision(Block block) {
 	        if(collidesWith(block)){
 	            ySpeed = - ySpeed;
-	            block.destroyed = true;
+                block.breakSound();
+                block.destroyed = true;
 	        }
 	    }
 	    private boolean collidesWith(Block bb) {
@@ -82,7 +83,23 @@ public class PingBall {
 	    	return intersectaX && intersectaY;
 	    }
 
+        public void checkCollision(ResilientBlock block) {
+            if(collidesWith(block)){
+                ySpeed = - ySpeed;
+                block.minusLives();
+                if (block.getLives() == 0) {
+                    block.breakSound();
+                    block.destroyed = true;
+                }
+            }
+        }
 
+        private boolean collidesWith(ResilientBlock bb) {
+
+            boolean intersectaX = (bb.x + bb.width >= x-size) && (bb.x <= x+size);
+            boolean intersectaY = (bb.y + bb.height >= y-size) && (bb.y <= y+size);
+            return intersectaX && intersectaY;
+        }
 
 
 
