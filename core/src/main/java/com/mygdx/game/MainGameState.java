@@ -11,12 +11,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.sun.tools.javac.Main;
 
 import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Random;
 
 public class MainGameState extends GameState {
 
     // Colecciones de atributos del juego
     private ArrayList<PowerUp> powerUps = new ArrayList<>();
-    private ArrayList<Block> blocks = new ArrayList<>();
+    private ArrayList<Object> blocks = new ArrayList<>();
 
     // Atributos varios
     private OrthographicCamera camera;
@@ -60,11 +62,28 @@ public class MainGameState extends GameState {
         int blockWidth = 70;
         int blockHeight = 26;
         int y = Gdx.graphics.getHeight();
+
         for (int cont = 0; cont<rows; cont++ ) {
             y -= blockHeight+10;
+            Random random = new Random();
             for (int x = 5; x < Gdx.graphics.getWidth(); x += blockWidth + 10) {
-                blocks.add(new Block(x, y, blockWidth, blockHeight));
+                double prob = Math.random();
+                System.out.println("prob:"+prob);
+                if (prob < 0.3) {
+                    blocks.add(new ResilientBlock(x, y, blockWidth, blockHeight));
+                } else {
+                    blocks.add(new Block(x, y, blockWidth, blockHeight));
+                }
+                if (blocks.get(cont) instanceof ResilientBlock) {
+                    System.out.println("#"+cont+"BloqueResistente");
+                } else if (blocks.get(cont) instanceof Block){
+                    System.out.println("#"+cont+"BloqueNormal");
+                } else {
+                    System.out.println("########");
+                }
             }
+
+
         }
     }
 
@@ -99,7 +118,7 @@ public class MainGameState extends GameState {
                 ball.update();// Actualiza la posición de cada pelota
         }
 
-        //verificar si se fue la bola x abajo
+        // verificar si se fue la bola x abajo
         if (ball.getY()<0) {
             if(!config.getShield()){
                 aux = config.getLives();
@@ -120,42 +139,79 @@ public class MainGameState extends GameState {
         }
 
         // verificar si el nivel se terminó
-        if (blocks.size()==0) {
+        if (blocks.isEmpty()) {
             aux = config.getLevel();
             config.setLevel(aux+1);
             createBlocks(2+config.getLevel());
             ball = new PingBall(pad.getX()+pad.getWidth()/2-5, pad.getY()+pad.getHeight()+11, 10, 5, 7, true);
         }
 
-        //dibujar bloques
-        for (Block b : blocks) {
-            b.draw(shape);
-            ball.checkCollision(b);
+        // dibujar bloques y checkear colisiones de pelota con bloques
+        for (Object b : blocks) {
+
+            if (b instanceof Block) {
+                ((Block)b).draw(shape);
+                ball.checkCollision((Block)b);
+            } else if (b instanceof ResilientBlock) {
+                ((ResilientBlock)b).draw(shape);
+                ball.checkCollision((ResilientBlock) b);
+            }
+
         }
 
         // actualizar estado de los bloques
         for (int i = 0; i < blocks.size(); i++) {
-            Block b = blocks.get(i);
-            if (b.destroyed) {
-                if(Math.random() < 0.30){
-                    double powerUpChance = Math.random();
 
-                    PowerUp newPower;
-                    if (powerUpChance < 0.6) { // 60% de probabilidad para Enlarge
-                        builder.setType(Enlarge.class).setColor(Color.GOLD);
-                    } else if (powerUpChance < 0.85) { // 25% de probabilidad para Shield
-                        builder.setType(Shield.class).setColor(Color.ORANGE);
-                    } else { // 15% de probabilidad para ExtraLife
-                        builder.setType(ExtraLife.class).setColor(Color.GREEN);
+            if (blocks.get(i) instanceof Block) {
+
+                Block b = (Block) blocks.get(i);
+                if (b.destroyed) {
+                    if(Math.random() < 0.30){
+                        double powerUpChance = Math.random();
+
+                        PowerUp newPower;
+                        if (powerUpChance < 0.6) { // 60% de probabilidad para Enlarge
+                            builder.setType(Enlarge.class).setColor(Color.GOLD);
+                        } else if (powerUpChance < 0.85) { // 25% de probabilidad para Shield
+                            builder.setType(Shield.class).setColor(Color.ORANGE);
+                        } else { // 15% de probabilidad para ExtraLife
+                            builder.setType(ExtraLife.class).setColor(Color.GREEN);
+                        }
+                        newPower = builder.setPosition(b.getX(), b.getY()).setSize(10).setSpeed(2).build();
+                        powerUps.add(newPower);
                     }
-                    newPower = builder.setPosition(b.getX(), b.getY()).setSize(10).setSpeed(2).build();
-                    powerUps.add(newPower);
+                    aux = config.getPoints();
+                    config.addPoints(aux+1);
+                    blocks.remove(b);
+                    i--; //para no saltarse 1 tras eliminar del arraylist
                 }
-                aux = config.getPoints();
-                config.addPoints(aux+1);
-                blocks.remove(b);
-                i--; //para no saltarse 1 tras eliminar del arraylist
+
+            } else if (blocks.get(i) instanceof ResilientBlock) {
+
+                ResilientBlock b = (ResilientBlock) blocks.get(i);
+                if (b.destroyed) {
+                    if(Math.random() < 0.30){
+                        double powerUpChance = Math.random();
+
+                        PowerUp newPower;
+                        if (powerUpChance < 0.6) { // 60% de probabilidad para Enlarge
+                            builder.setType(Enlarge.class).setColor(Color.GOLD);
+                        } else if (powerUpChance < 0.85) { // 25% de probabilidad para Shield
+                            builder.setType(Shield.class).setColor(Color.ORANGE);
+                        } else { // 15% de probabilidad para ExtraLife
+                            builder.setType(ExtraLife.class).setColor(Color.GREEN);
+                        }
+                        newPower = builder.setPosition(b.getX(), b.getY()).setSize(10).setSpeed(2).build();
+                        powerUps.add(newPower);
+                    }
+                    aux = config.getPoints();
+                    config.addPoints(aux+1);
+                    blocks.remove(b);
+                    i--; //para no saltarse 1 tras eliminar del arraylist
+                }
             }
+
+
         }
 
         // agregar los power ups a la pantalla
@@ -187,6 +243,13 @@ public class MainGameState extends GameState {
         font.dispose();
         batch.dispose();
         shape.dispose();
+        for (Object b : blocks) {
+            if (b instanceof Block) {
+                ((Block)b).dispose();
+            } else if (b instanceof ResilientBlock) {
+                ((ResilientBlock)b).dispose();
+            }
+        }
     }
 
 
